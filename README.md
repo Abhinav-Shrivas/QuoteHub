@@ -1,10 +1,14 @@
-# RFQ Market — Mini B2B RFQ Marketplace
+# QuoteHub — Mini B2B RFQ Marketplace
 
 A full-stack B2B Request for Quotation marketplace where **Buyers** create RFQs and **Suppliers** submit quotations.
 
 ## Live Demo
 
-> _Deployment URL will be added after deploying._
+🔗 **Live Application URL:** [https://quotehub-yfat.onrender.com](https://quotehub-yfat.onrender.com)
+
+> [!NOTE]
+> **Render Free Tier (Cold Start):**  
+> Since this project is hosted on Render's free tier, the backend web service spins down after a period of inactivity. If the service is currently asleep, the initial load may take around **30 to 50 seconds** to wake up. Once active, the application responds immediately and smoothly.
 
 ### Demo Credentials
 
