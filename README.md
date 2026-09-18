@@ -6,6 +6,16 @@ A full-stack B2B Request for Quotation marketplace where **Buyers** create RFQs 
 
 > _Deployment URL will be added after deploying._
 
+### Demo Credentials
+
+For quick testing, pre-seeded accounts can be auto-filled with one click on the login page:
+
+| Role | Email | Password | Company |
+|------|-------|----------|---------|
+| **Buyer** | `buyer@test.com` | `password123` | Acme Global Corp |
+| **Supplier** | `supplier@test.com` | `password123` | Apex Steel & Supplies Ltd |
+
+
 ## Technology Stack
 
 | Layer | Technology |

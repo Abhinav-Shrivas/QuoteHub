@@ -9,9 +9,27 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeDemo, setActiveDemo] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFillDemo = (role) => {
+    if (role === 'buyer') {
+      setFormData({
+        email: 'buyer@test.com',
+        password: 'password123',
+      });
+      setActiveDemo('buyer');
+    } else {
+      setFormData({
+        email: 'supplier@test.com',
+        password: 'password123',
+      });
+      setActiveDemo('supplier');
+    }
+    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -41,6 +59,58 @@ export default function Login() {
           </div>
 
           {error && <div className="error-banner">⚠ {error}</div>}
+
+          {/* Quick Demo Credentials Panel */}
+          <div className="demo-credentials-section">
+            <div className="demo-credentials-header">
+              <span className="demo-title">
+                <span className="demo-icon">🔑</span> Demo Credentials
+              </span>
+              <span className="demo-hint-tag">Click to auto-fill</span>
+            </div>
+
+            <div className="demo-accounts-grid">
+              <button
+                type="button"
+                className={`demo-account-card ${activeDemo === 'buyer' ? 'selected' : ''}`}
+                onClick={() => handleFillDemo('buyer')}
+                title="Click to fill Buyer credentials"
+              >
+                <div className="demo-account-header">
+                  <span className="demo-role-badge badge-buyer">🛒 Buyer</span>
+                  <span className="demo-action-btn">
+                    {activeDemo === 'buyer' ? '✓ Filled' : 'Auto-fill'}
+                  </span>
+                </div>
+                <div className="demo-account-email">buyer@test.com</div>
+                <div className="demo-account-pass">
+                  Password: <code>password123</code>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className={`demo-account-card ${activeDemo === 'supplier' ? 'selected' : ''}`}
+                onClick={() => handleFillDemo('supplier')}
+                title="Click to fill Supplier credentials"
+              >
+                <div className="demo-account-header">
+                  <span className="demo-role-badge badge-supplier">🏭 Supplier</span>
+                  <span className="demo-action-btn">
+                    {activeDemo === 'supplier' ? '✓ Filled' : 'Auto-fill'}
+                  </span>
+                </div>
+                <div className="demo-account-email">supplier@test.com</div>
+                <div className="demo-account-pass">
+                  Password: <code>password123</code>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div className="auth-divider">
+            <span>Or enter credentials manually</span>
+          </div>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">

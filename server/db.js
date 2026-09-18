@@ -54,4 +54,29 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_quotations_supplier_id ON quotations(supplier_id);
 `);
 
+// Seed demo accounts if they don't already exist
+try {
+  const bcrypt = require('bcryptjs');
+  const buyerCheck = db.prepare('SELECT id FROM users WHERE email = ?').get('buyer@test.com');
+  if (!buyerCheck) {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync('password123', salt);
+    db.prepare(
+      'INSERT INTO users (name, email, password, role, company) VALUES (?, ?, ?, ?, ?)'
+    ).run('Demo Buyer', 'buyer@test.com', hash, 'buyer', 'Acme Global Corp');
+  }
+
+  const supplierCheck = db.prepare('SELECT id FROM users WHERE email = ?').get('supplier@test.com');
+  if (!supplierCheck) {
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync('password123', salt);
+    db.prepare(
+      'INSERT INTO users (name, email, password, role, company) VALUES (?, ?, ?, ?, ?)'
+    ).run('Demo Supplier', 'supplier@test.com', hash, 'supplier', 'Apex Steel & Supplies Ltd');
+  }
+} catch (err) {
+  console.error('Demo user seeding warning:', err.message);
+}
+
 module.exports = db;
+
