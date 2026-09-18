@@ -4,11 +4,13 @@ A full-stack B2B Request for Quotation marketplace where **Buyers** create RFQs 
 
 ## Live Demo
 
-🔗 **Live Application URL:** [https://quotehub-yfat.onrender.com](https://quotehub-yfat.onrender.com)
+- 🔗 **Live Application URL:** [https://quotehub-yfat.onrender.com](https://quotehub-yfat.onrender.com)
+- 📦 **GitHub Repository:** [https://github.com/Abhinav-Shrivas/QuoteHub](https://github.com/Abhinav-Shrivas/QuoteHub)
 
 > [!NOTE]
-> **Render Free Tier (Cold Start):**  
-> Since this project is hosted on Render's free tier, the backend web service spins down after a period of inactivity. If the service is currently asleep, the initial load may take around **30 to 50 seconds** to wake up. Once active, the application responds immediately and smoothly.
+> **Render Free Tier & Data Persistence:**  
+> - **Cold Start:** Since this project is hosted on Render's free tier, the backend web service spins down after a period of inactivity. If the service is currently asleep, the initial load may take around **30 to 50 seconds** to wake up. Once active, the application responds immediately and smoothly.
+> - **SQLite Persistence (Ephemeral Disk):** Because Render free web services run on ephemeral disks, new records (such as freshly registered accounts, newly posted RFQs, or new bids) will not persist permanently across instance spin-downs or redeployments. However, the pre-seeded demo accounts and base catalog are automatically re-initialized on every restart for uninterrupted testing.
 
 ### Demo Credentials
 
@@ -52,7 +54,7 @@ For quick testing, I have pre-seeded two demo accounts that can be auto-filled w
 ```
 
 **Key Architectural Decisions:**
-- **I chose SQLite** over PostgreSQL for zero-configuration simplicity during evaluation. The application is a focused prototype where SQLite handles this workload cleanly; in a high-concurrency production setting, I would migrate to PostgreSQL.
+- **I chose SQLite** over PostgreSQL for zero-configuration simplicity during evaluation. The application is a focused prototype where SQLite handles this workload cleanly. Because Render's free tier uses ephemeral storage, new records reset on instance spin-downs/redeployments; for a full-scale production deployment, I would attach persistent storage or migrate to PostgreSQL.
 - **I used a monorepo structure** with `client/` and `server/` directories. For production deployment, I configured the Express server to serve the built Vite assets as a single unified process.
 - **I configured JWT authentication** stored in `localStorage` with a 7-day expiry, encoding the user role directly in the payload for immediate frontend routing checks.
 - **I enforced a single active quotation per supplier per RFQ** at the database level via a `UNIQUE(rfq_id, supplier_id)` constraint, while allowing suppliers to revise and update their submitted bids.
@@ -65,8 +67,8 @@ For quick testing, I have pre-seeded two demo accounts that can be auto-filled w
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
-cd rfq-marketplace
+git clone https://github.com/Abhinav-Shrivas/QuoteHub.git
+cd QuoteHub
 ```
 
 ### 2. Install dependencies
