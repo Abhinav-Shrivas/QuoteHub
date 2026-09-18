@@ -53,9 +53,11 @@ export default function Login() {
       <div className="auth-container">
         <div className="auth-card animate-in">
           <div className="auth-header">
-            <div className="auth-logo">⚡</div>
+            <div className="auth-logo-wrapper">
+              <img src="/logo.png" alt="QuoteHub Logo" className="auth-brand-logo" />
+            </div>
             <h1>Welcome back</h1>
-            <p>Sign in to your RFQ Marketplace account</p>
+            <p>Sign in to your QuoteHub account</p>
           </div>
 
           {error && <div className="error-banner">⚠ {error}</div>}

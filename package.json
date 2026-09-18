@@ -1,0 +1,21 @@
+{
+  "name": "quotehub-marketplace",
+  "version": "1.0.0",
+  "description": "QuoteHub - Mini B2B RFQ Marketplace",
+  "scripts": {
+    "build": "npm --prefix client install && npm --prefix client run build && npm --prefix server install",
+    "start": "npm --prefix server start",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev"
+  },
+  "keywords": [
+    "b2b",
+    "rfq",
+    "marketplace",
+    "react",
+    "express",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "ISC"
+}

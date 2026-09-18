@@ -21,8 +21,8 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="navbar-brand">
-          <span className="navbar-brand-icon">⚡</span>
-          RFQ Market
+          <img src="/logo.png" alt="QuoteHub Logo" className="navbar-brand-logo" />
+          <span className="navbar-brand-text">QuoteHub</span>
         </Link>
 
         <button

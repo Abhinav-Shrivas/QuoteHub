@@ -49,9 +49,11 @@ export default function Register() {
       <div className="auth-container">
         <div className="auth-card animate-in">
           <div className="auth-header">
-            <div className="auth-logo">⚡</div>
+            <div className="auth-logo-wrapper">
+              <img src="/logo.png" alt="QuoteHub Logo" className="auth-brand-logo" />
+            </div>
             <h1>Create Account</h1>
-            <p>Join the RFQ Marketplace</p>
+            <p>Join QuoteHub — Post Needs. Find Solutions.</p>
           </div>
 
           {error && <div className="error-banner">⚠ {error}</div>}

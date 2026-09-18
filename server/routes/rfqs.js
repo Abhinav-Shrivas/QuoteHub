@@ -187,11 +187,21 @@ router.delete('/:id', authenticate, authorize('buyer'), (req, res) => {
     return res.status(404).json({ error: 'RFQ not found.' });
   }
 
-  if (rfq.buyer_id !== req.user.id) {
+  if (Number(rfq.buyer_id) !== Number(req.user.id)) {
     return res.status(403).json({ error: 'You can only delete your own RFQs.' });
   }
 
-  db.prepare('DELETE FROM rfqs WHERE id = ?').run(req.params.id);
+  // Delete associated quotations and the RFQ in a transaction
+  const deleteQuotes = db.prepare('DELETE FROM quotations WHERE rfq_id = ?');
+  const deleteRfq = db.prepare('DELETE FROM rfqs WHERE id = ?');
+
+  const deleteTransaction = db.transaction(() => {
+    deleteQuotes.run(req.params.id);
+    deleteRfq.run(req.params.id);
+  });
+
+  deleteTransaction();
+
   res.json({ message: 'RFQ deleted successfully.' });
 });
 
@@ -206,7 +216,7 @@ router.patch('/:id/close', authenticate, authorize('buyer'), (req, res) => {
     return res.status(404).json({ error: 'RFQ not found.' });
   }
 
-  if (rfq.buyer_id !== req.user.id) {
+  if (Number(rfq.buyer_id) !== Number(req.user.id)) {
     return res.status(403).json({ error: 'You can only close your own RFQs.' });
   }
 

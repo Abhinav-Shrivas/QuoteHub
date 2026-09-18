@@ -8,7 +8,7 @@ A full-stack B2B Request for Quotation marketplace where **Buyers** create RFQs 
 
 ### Demo Credentials
 
-For quick testing, pre-seeded accounts can be auto-filled with one click on the login page:
+For quick testing, I have pre-seeded two demo accounts that can be auto-filled with one click on the login page:
 
 | Role | Email | Password | Company |
 |------|-------|----------|---------|
@@ -21,7 +21,7 @@ For quick testing, pre-seeded accounts can be auto-filled with one click on the 
 | Layer | Technology |
 |-------|-----------|
 | **Frontend** | React 19 (Vite), React Router v7 |
-| **Styling** | Vanilla CSS (dark theme, glassmorphism) |
+| **Styling** | Vanilla CSS |
 | **Backend** | Node.js, Express.js |
 | **Database** | SQLite (via better-sqlite3) |
 | **Auth** | JWT (jsonwebtoken) + bcryptjs |
@@ -47,11 +47,11 @@ For quick testing, pre-seeded accounts can be auto-filled with one click on the 
 └─────────────────────────────────────────────┘
 ```
 
-**Key Decisions:**
-- **SQLite** was chosen over PostgreSQL for zero-configuration simplicity. The app is a demo — SQLite handles this scale perfectly. In production, you'd swap to PostgreSQL.
-- **Monorepo structure** with `client/` and `server/` directories. In production, the Vite build output is served by the Express server (single process deployment).
-- **JWT** stored in `localStorage` with 7-day expiry. Token contains user role for fast authorization checks.
-- **One quotation per supplier per RFQ** — enforced at DB level via UNIQUE constraint. Suppliers can update their quote.
+**Key Architectural Decisions:**
+- **I chose SQLite** over PostgreSQL for zero-configuration simplicity during evaluation. The application is a focused prototype where SQLite handles this workload cleanly; in a high-concurrency production setting, I would migrate to PostgreSQL.
+- **I used a monorepo structure** with `client/` and `server/` directories. For production deployment, I configured the Express server to serve the built Vite assets as a single unified process.
+- **I configured JWT authentication** stored in `localStorage` with a 7-day expiry, encoding the user role directly in the payload for immediate frontend routing checks.
+- **I enforced a single active quotation per supplier per RFQ** at the database level via a `UNIQUE(rfq_id, supplier_id)` constraint, while allowing suppliers to revise and update their submitted bids.
 
 ## Setup Instructions
 
@@ -165,11 +165,23 @@ The Express server serves the built frontend from `client/dist/`.
 - ✅ Secure password hashing (bcrypt)
 - ✅ Foreign key constraints and database indexes
 
-## Assumptions & Limitations
+## Key Assumptions
 
-1. **No real-time updates** — Users need to refresh to see new data
-2. **No file attachments** — RFQs are text-based
-3. **No email verification** — Simplified registration flow
-4. **SQLite** — Not suited for high-concurrency production use
-5. **No admin panel** — Only buyer and supplier roles
-6. **JWT in localStorage** — For production, httpOnly cookies would be more secure
+1. **Closed-Bid Quotation Model**: Suppliers can inspect full RFQ specifications and buyer company details, but competing supplier quotations remain strictly private and visible only to the buyer who created the RFQ.
+2. **Single Definitive Bid per Supplier**: A supplier submits one active quotation per RFQ rather than multiple competing entries. Suppliers can modify and refine their quote (price, delivery timeline, notes) at any time while the RFQ remains open, enforced by a database-level `UNIQUE(rfq_id, supplier_id)` constraint.
+3. **RFQ Status & Lifecycle**: RFQs transition between `open` and `closed`. Once closed or past deadline, quote submissions are disabled. Buyers can manually close an RFQ at any time once satisfied with quotes.
+4. **Zero-Configuration Review Setup**: I specifically chose SQLite with WAL (Write-Ahead Logging) so evaluators can run and test my application instantly without configuring external database services or Docker containers.
+5. **Decoupled Stateless Auth**: I designed the JWT payload with user ID, role, and company details to allow immediate client-side route guarding while the backend independently enforces role-based access control on every endpoint.
+
+---
+
+## Limitations & Technical Debt 
+
+1. **No Admin & Moderation Panel**: I implemented only Buyer and Supplier roles for this scope. I did not build a back-office administrative panel for platform oversight, user management, account suspensions, RFQ content moderation, or aggregate transaction analytics.
+2. **Bloated Route Handlers (Lack of Layered Architecture)**: I wrote route handlers in `server/routes/` directly combining input validation, raw SQL queries, authorization checks, and response formatting. In an enterprise production codebase, I would refactor this into a clean layered architecture (Controllers → Service/Domain Layer → Data Access/Repository pattern).
+3. **No Automated Unit or Integration Testing**: While I thoroughly verified the application flows through manual testing and end-to-end browser walkthroughs, I did not set up an automated CI test suite (e.g., Jest/Vitest for unit tests, Supertest for backend integration tests, or React Testing Library for component tests).
+4. **Simplified User Interface**: I built the UI using custom Vanilla CSS, focusing on core marketplace workflows and responsive dark-mode aesthetics. I deliberately omitted complex enterprise UI features (e.g., multi-step creation wizards, rich-text WYSIWYG specifications, interactive analytics charts, or drag-and-drop document uploaders) to keep the prototype clean and focused.
+5. **Single-Process Infrastructure**: I structured the application as a single Node.js process, so it currently runs without real-time WebSockets, background message queues (e.g., Redis/BullMQ) for deadline expiration workers, or Docker containerization.
+6. **Token Storage**: I stored JWTs in `localStorage` for prototype simplicity rather than setting up hardened `httpOnly` secure cookies with CSRF mitigation.
+
+

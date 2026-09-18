@@ -79,24 +79,37 @@ export default function RFQDetail() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this RFQ? This action cannot be undone.')) return;
+  const [actionModal, setActionModal] = useState(null); // 'close' | 'delete' | null
+  const [actionLoading, setActionLoading] = useState(false);
+
+  const confirmDelete = async () => {
+    setActionLoading(true);
+    setError('');
     try {
       await deleteRFQ(id);
+      setActionModal(null);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
+      setActionModal(null);
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const handleClose = async () => {
-    if (!window.confirm('Close this RFQ? It will no longer accept quotations.')) return;
+  const confirmClose = async () => {
+    setActionLoading(true);
+    setError('');
     try {
       await closeRFQ(id);
-      fetchData();
+      setActionModal(null);
+      await fetchData();
       setSuccess('RFQ closed successfully.');
     } catch (err) {
       setError(err.message);
+      setActionModal(null);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -130,8 +143,8 @@ export default function RFQDetail() {
     );
   }
 
-  const isBuyerOwner = user.role === 'buyer' && rfq.buyer_id === user.id;
-  const isSupplier = user.role === 'supplier';
+  const isBuyerOwner = user && user.role === 'buyer' && Number(rfq.buyer_id) === Number(user.id);
+  const isSupplier = user && user.role === 'supplier';
   const hasExistingQuote = rfq.my_quotation != null;
 
   return (
@@ -143,6 +156,42 @@ export default function RFQDetail() {
 
         {success && <div className="success-banner">✓ {success}</div>}
         {error && <div className="error-banner">⚠ {error}</div>}
+
+        {/* Action Confirmation Modal */}
+        {actionModal && (
+          <div className="modal-backdrop animate-fade" onClick={() => !actionLoading && setActionModal(null)}>
+            <div className="modal-dialog animate-in" onClick={(e) => e.stopPropagation()}>
+              <div className={`modal-icon-badge ${actionModal === 'delete' ? 'badge-danger-glow' : 'badge-success-glow'}`}>
+                {actionModal === 'delete' ? '🗑' : '✓'}
+              </div>
+              <h3>{actionModal === 'delete' ? 'Delete this RFQ?' : 'Close this RFQ?'}</h3>
+              <p>
+                {actionModal === 'delete'
+                  ? 'Are you sure you want to permanently delete this RFQ? All submitted quotations will also be deleted. This action cannot be undone.'
+                  : 'Once closed, this RFQ will no longer accept new quotations from suppliers. You can still review all received quotes.'}
+              </p>
+
+              <div className="modal-footer-buttons">
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-lg"
+                  onClick={() => setActionModal(null)}
+                  disabled={actionLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${actionModal === 'delete' ? 'btn-danger' : 'btn-success'} btn-lg`}
+                  onClick={actionModal === 'delete' ? confirmDelete : confirmClose}
+                  disabled={actionLoading}
+                >
+                  {actionLoading ? 'Processing...' : (actionModal === 'delete' ? 'Yes, Delete' : 'Yes, Close RFQ')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Header */}
         <div className="rfq-detail-header animate-in">
@@ -165,8 +214,8 @@ export default function RFQDetail() {
             {isBuyerOwner && rfq.status === 'open' && (
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <Link to={`/rfqs/${rfq.id}/edit`} className="btn btn-secondary btn-sm">✏ Edit</Link>
-                <button className="btn btn-success btn-sm" onClick={handleClose}>✓ Close RFQ</button>
-                <button className="btn btn-danger btn-sm" onClick={handleDelete}>🗑 Delete</button>
+                <button type="button" className="btn btn-success btn-sm" onClick={() => setActionModal('close')}>✓ Close RFQ</button>
+                <button type="button" className="btn btn-danger btn-sm" onClick={() => setActionModal('delete')}>🗑 Delete</button>
               </div>
             )}
           </div>
